@@ -34,6 +34,5 @@ fn main() {
     rocket::ignite()
     .attach(CORS())
         .mount("/metrics", routes![get_metrics])
-        .mount("/", routes![get_metrics])
     .launch();
 } 
