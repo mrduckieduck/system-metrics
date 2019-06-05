@@ -6,8 +6,10 @@
 #[macro_use] extern crate serde_derive;
 
 mod metrics;
+mod cors;
 
 use metrics::Metrics;
+use cors::CORS;
 use rocket_contrib::json::Json;
 use sysinfo::SystemExt;
 
@@ -19,7 +21,7 @@ fn get_metrics() -> Json<Metrics> {
 fn compute_metrics() -> Metrics {
     let mut system = sysinfo::System::new();
     system.refresh_all();
-
+    
     Metrics {
         total_memory: system.get_total_memory(),
         total_used_memory: system.get_used_memory(),
@@ -29,5 +31,9 @@ fn compute_metrics() -> Metrics {
 }
 
 fn main() {
-    rocket::ignite().mount("/metrics", routes![get_metrics]).launch();
+    rocket::ignite()
+    .attach(CORS())
+        .mount("/metrics", routes![get_metrics])
+        .mount("/", routes![get_metrics])
+    .launch();
 } 
